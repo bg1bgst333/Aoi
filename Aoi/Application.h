@@ -7,6 +7,7 @@
 #include <windows.h>	// 標準WindowsAPI
 // 独自のヘッダ
 #include "Window.h"	// CWindow
+
 // アプリケーションクラスCApplication
 class CApplication {
 

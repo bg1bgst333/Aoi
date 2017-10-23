@@ -1,21 +1,19 @@
 // ヘッダのインクルード
 // 独自のヘッダ
 #include "MainApplication.h"	// CMainApplication
-
-// 関数のプロトタイプ宣言.
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);	// ウィンドウプロシージャWindowProc
+#include "MainWindow.h"	// CMainWindow
 
 // メンバ関数InitInstance
 BOOL CMainApplication::InitInstance(HINSTANCE hInstance, LPTSTR lpCmdLine, int nShowCmd) {
 
 	// ウィンドウクラスの登録.
-	CWindow::RegisterClass(hInstance, _T("Aoi"));	// CWindow::RegisterClassでウィンドウクラス名"Aoi"を登録.
+	CMainWindow::RegisterClass(hInstance);	// CMainWindow::RegisterClassでウィンドウクラス名"CMainWindow"を登録.
 
-	// CWindowオブジェクトの作成.
-	m_pMainWindow = new CWindow();	// CWindowオブジェクトを作成し, m_pMainWindowに格納.
+	// CMainWindowオブジェクトの作成.
+	m_pMainWindow = new CMainWindow();	// CMainWindowオブジェクトを作成し, m_pMainWindowに格納.
 
 	// ウィンドウの作成.
-	if (!m_pMainWindow->Create(_T("Aoi"), _T("Aoi"), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance)) {	// m_pMainWindow->Createでウィンドウ作成に失敗した時.
+	if (!m_pMainWindow->Create(_T("Aoi"), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance)) {	// m_pMainWindow->Createでウィンドウ作成に失敗した時.
 
 		// 失敗ならFALSE.
 		return FALSE;	// FALSEを返す.
