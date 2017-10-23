@@ -1,7 +1,6 @@
 // ヘッダのインクルード
-// 既定のヘッダ
-#include <tchar.h>	// TCHAR型
-#include <windows.h>	// 標準WindowsAPI
+// 独自のヘッダ
+#include "MainApplication.h"	// CMainApplication
 
 // 関数のプロトタイプ宣言.
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);	// ウィンドウプロシージャWindowProc
@@ -9,56 +8,31 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 // _tWinMain関数
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nShowCmd) {
 
-	// 変数・構造体の宣言.
-	HWND hWnd;	// HWND型ウィンドウハンドルhWnd
-	MSG msg;	// MSG型メッセージ構造体msg
-	WNDCLASS wc;	// WNDCLASS型ウィンドウクラス構造体wc
+	// 変数の宣言.
+	int iRet;	// 戻り値を受け取るint型変数iRet.
 
-	// ウィンドウクラス構造体wcにパラメータを設定.
-	wc.lpszClassName = _T("Aoi");	// ウィンドウクラス名はとりあえず"Aoi"とする.
-	wc.style = CS_HREDRAW | CS_VREDRAW;	// スタイルはとりあえずCS_HREDRAW | CS_VREDRAW.
-	wc.lpfnWndProc = WindowProc;	// ウィンドウプロシージャは下で定義するWindowProc.
-	wc.hInstance = hInstance;	// アプリケーションインスタンスハンドルは引数のhInstanceを使う.
-	wc.hIcon = LoadIcon(hInstance, IDI_APPLICATION);	// LoadIconでアプリケーション既定のアイコンをロード.
-	wc.hCursor = LoadCursor(hInstance, IDC_ARROW);	// LoadCursorでアプリケーション既定のカーソルをロード.
-	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);	// GetStockObjectで白ブラシを背景色とする.
-	wc.lpszMenuName = NULL;	// とりあえずメニューはなし(NULLにする.)
-	wc.cbClsExtra = 0;	// とりあえず0を指定.
-	wc.cbWndExtra = 0;	// とりあえず0を指定.
+	// メインアプリケーションオブジェクトの作成.
+	CApplication *pApplication = new CMainApplication();	// newでCMainApplicationオブジェクトを作成し, CApplicationオブジェクトポインタpApplicationに格納.
 
-	// ウィンドウクラスの登録.
-	if (!RegisterClass(&wc)) {	// RegisterClassでウィンドウクラスを登録する.
+	// メインアプリケーションの初期化.
+	if (!pApplication->InitInstance(hInstance, lpCmdLine, nShowCmd)) {	// pApplication->InitInstanceで初期化.
 
-		// 戻り値が0なら登録失敗なのでエラー処理.
-		MessageBox(NULL, _T("予期せぬエラーが発生しました!(-1)"), _T("Aoi"), MB_OK);	// MessageBoxで"予期せぬエラーが発生しました!(-1)"と表示.
-		return -1;	// -1を返して異常終了.
+		// 失敗したらExitInstanceを呼ぶ.
+		iRet = pApplication->ExitInstance();	// pApplication->ExitInstanceを呼び, 戻り値をiRetに格納.
+
+	}
+	else {	// 成功した時.
+
+		// メッセージループと終了処理.
+		iRet = pApplication->Run();	// pApplication->Runでメッセージループ処理.(中でExitInstanceも実行される.)
 
 	}
 
-	// ウィンドウの作成
-	hWnd = CreateWindow(wc.lpszClassName, _T("Aoi"), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);	// CreateWindowでウィンドウクラス名"Aoi"なウィンドウ"Aoi"を作成.
-	if (hWnd == NULL) {	// hWndがNULLならウィンドウ作成失敗.
-
-		// エラー処理.
-		MessageBox(NULL, _T("予期せぬエラーが発生しました!(-2)"), _T("Aoi"), MB_OK);	// MessageBoxで"予期せぬエラーが発生しました!(-2)"と表示.
-		return -2;	// -2を返して異常終了.
-
-	}
-
-	// ウィンドウの表示.
-	ShowWindow(hWnd, SW_SHOW);	// ShowWindowでウィンドウを表示.
-
-	// メッセージループの処理.
-	while (GetMessage(&msg, NULL, 0, 0) > 0) {	// GetMessageでウィンドウメッセージを取得し, msgに格納.(0以下なら, ここを抜ける.)
-
-		// メッセージの変換と送出.
-		TranslateMessage(&msg);	// TranslateMessageで仮想キーメッセージを文字メッセージへ変換.
-		DispatchMessage(&msg);	// DispatchMessageでメッセージをウィンドウプロシージャWindowProcに送出.
-
-	}
+	// アプリケーションオブジェクトの破棄.
+	delete pApplication;	// deleteでpApplicationを破棄.
 
 	// プログラムの終了.
-	return (int)msg.wParam;	// 終了コード(msg.wParam)を戻り値として返す.
+	return iRet;	// iRetを返す.
 
 }
 
