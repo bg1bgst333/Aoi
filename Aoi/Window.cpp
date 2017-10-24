@@ -216,6 +216,25 @@ LRESULT CWindow::DynamicWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 			// 既定の処理へ向かう.
 			break;	// 抜けてDefWindowProcに向かう.
 
+		// ウィンドウサイズが変更された時.
+		case WM_SIZE:
+
+			// WM_SIZEブロック
+			{
+
+				// 変数の初期化.
+				UINT nType = wParam;		// nTypeをwParamで初期化.
+				int cx = LOWORD(lParam);	// cxをLOWORD(lParam)で初期化.
+				int cy = HIWORD(lParam);	// cyをHIWORD(lParam)で初期化.
+
+				// OnSizeに任せる.
+				OnSize(nType, cx, cy);	// OnSizeにnType, cx, cyを渡す.
+
+			}
+
+			// 既定の処理へ向かう.
+			break;	// 抜けてDefWindowProcに向かう.
+
 		// コマンドが発生した時.
 		case WM_COMMAND:
 
@@ -261,6 +280,13 @@ void CWindow::OnDestroy() {
 
 	// メッセージループ終了.
 	PostQuitMessage(0);	// PostQuitMessageでメッセージループを抜けさせる.
+
+}
+
+// メンバ関数OnSize
+void CWindow::OnSize(UINT nType, int cx, int cy) {
+
+	// 何もしない.
 
 }
 

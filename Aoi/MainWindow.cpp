@@ -6,10 +6,19 @@
 // コンストラクタCMainWindow
 CMainWindow::CMainWindow() : CMenuWindow(){
 
+	// メンバの初期化.
+	m_pEdit = NULL;	// m_pEditをNULLで初期化.
+
 }
 
 // デストラクタ~CMainWindow
 CMainWindow::~CMainWindow() {
+
+	// メンバの終了処理.
+	if (m_pEdit != NULL) {
+		delete m_pEdit;	// deleteでm_pEditを解放.
+		m_pEdit = NULL;	// m_pEditにNULLをセット.
+	}
 
 }
 
@@ -45,6 +54,12 @@ int CMainWindow::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 	AddCommandHandler(ID_FILE_OPEN, 0, (int(CWindow::*)(WPARAM, LPARAM))&CMainWindow::OnFileOpen);	// AddCommandHandlerでID_FILE_OPENに対するハンドラCMainWindow::OnFileOpenを登録.
 	AddCommandHandler(ID_FILE_SAVEAS, 0, (int(CWindow::*)(WPARAM, LPARAM))&CMainWindow::OnFileSaveAs);	// AddCommandHandlerでID_FILE_SAVEASに対するハンドラCMainWindow::OnFileSaveAsを登録.
 
+	// エディットコントロールオブジェクトの作成.
+	m_pEdit = new CEdit();	// CEditオブジェクトを作成し, ポインタをm_pEditに格納.
+
+	// エディットコントロールの作成.
+	m_pEdit->Create(_T(""), WS_HSCROLL | WS_VSCROLL | WS_BORDER | ES_MULTILINE | ES_WANTRETURN | ES_AUTOHSCROLL | ES_AUTOVSCROLL, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hwnd, (HMENU)(WM_APP + 1), lpCreateStruct->hInstance);	// m_pEdit->Createでエディットコントロールを作成.
+
 	// 今回は常にウィンドウ作成成功とする.
 	return 0;	// 成功なら0を返す.
 
@@ -59,6 +74,16 @@ void CMainWindow::OnDestroy() {
 
 	// 親のOnDestroyを呼ぶ.
 	CMenuWindow::OnDestroy();	// CMenuWindow::OnDestroyを呼ぶ.
+
+}
+
+// メンバ関数OnSize
+void CMainWindow::OnSize(UINT nType, int cx, int cy) {
+
+	// 子ウィンドウのサイズも合わせる.
+	if (m_pEdit != NULL) {	// NULLでないなら.
+		MoveWindow(m_pEdit->m_hWnd, 0, 0, cx, cy, TRUE);	// MoveWindowでエディットコントロールのサイズを合わせる.
+	}
 
 }
 
