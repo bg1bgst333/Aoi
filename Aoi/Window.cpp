@@ -4,6 +4,7 @@
 
 // staticメンバ変数の定義.
 std::map<HWND, CWindow *> CWindow::m_mapWindowMap;	// ウィンドウマップm_mapWindowMap.
+std::map<DWORD, HandlerConditions*> CWindow::m_mapHandlerMap;	// ハンドラマップm_mapHandlerMap.
 
 // コンストラクタCWindow()
 CWindow::CWindow() {
@@ -155,6 +156,32 @@ BOOL CWindow::ShowWindow(int nCmdShow) {
 
 }
 
+// メンバ関数AddCommandHandler
+void CWindow::AddCommandHandler(UINT nID, UINT nCode, int(CWindow:: * handler)(WPARAM wParam, LPARAM lParam)) {
+
+	// HandlerConditionsの生成.
+	HandlerConditions *pCond = new HandlerConditions();	// HandlerConditionsオブジェクトを作成し, ポインタをpCondに格納.
+	pCond->nID = nID;	// pCond->nIDにnIDを格納.
+	pCond->nCode = nCode;	// pCond->nCodeにnCodeを格納.
+	pCond->hfp = handler;	// pCond->hfpにhandlerを格納.
+	CWindow::m_mapHandlerMap.insert(std::pair<DWORD, HandlerConditions *>((DWORD)MAKEWPARAM(nID, nCode), pCond));	// CWindow::m_mapHandlerMap.insertでnID, nCodeをMAKEWPARAMしたものをキー, pCondを値として登録.
+
+}
+
+// メンバ関数
+void CWindow::DeleteCommandHandler(UINT nID, UINT nCode) {
+
+	// ハンドラ情報を削除.
+	HandlerConditions *pCond = NULL;	// HandlerConditionsオブジェクトポインタpCondをNULLに初期化.
+	std::map<DWORD, HandlerConditions *>::iterator itor = CWindow::m_mapHandlerMap.find((DWORD)(MAKEWPARAM(nID, nCode)));	// findでキーを(DWORD)(MAKEWPARAM(nID, nCode))とするHandlerConditionsオブジェクトポインタのイテレータ取得.
+	if (itor != CWindow::m_mapHandlerMap.end()) {	// 見つかったら.
+		pCond = CWindow::m_mapHandlerMap[(DWORD)(MAKEWPARAM(nID, nCode))];	// (DWORD)(MAKEWPARAM(nID, nCode))を使ってハンドラマップからHandlerConditionsオブジェクトポインタを引き出す.
+		delete pCond;	// HandlerConditionsオブジェクトを破棄.
+		CWindow::m_mapHandlerMap.erase(itor);	// itorの指す要素を削除.
+	}
+
+}
+
 // メンバ関数DynamicWindowProc
 LRESULT CWindow::DynamicWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
@@ -189,6 +216,20 @@ LRESULT CWindow::DynamicWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 			// 既定の処理へ向かう.
 			break;	// 抜けてDefWindowProcに向かう.
 
+		// コマンドが発生した時.
+		case WM_COMMAND:
+
+			// WM_COMMANDブロック
+			{
+
+				// OnCommandに任せる.
+				return OnCommand(wParam, lParam) ? 0 : 1;	// wParamとlParamを渡して任せる.
+
+			}
+
+			// 既定の処理へ向かう.
+			break;	// 抜けてDefWindowProcに向かう.
+
 		// それ以外の時.
 		default:
 
@@ -213,7 +254,32 @@ int CWindow::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 // メンバ関数OnDestroy
 void CWindow::OnDestroy() {
 
+	// 自分のウィンドウハンドルが残っていたらマップから削除.
+	if (CWindow::m_mapWindowMap.find(m_hWnd) != CWindow::m_mapWindowMap.end()) {	// findで見つかったら.
+		CWindow::m_mapWindowMap.erase(m_hWnd);	// CWindow::m_mapWindowMap.eraseで削除.
+	}
+
 	// メッセージループ終了.
 	PostQuitMessage(0);	// PostQuitMessageでメッセージループを抜けさせる.
+
+}
+
+// メンバ関数OnCommand
+BOOL CWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
+
+	// wParamからハンドラ情報を引き出す.
+	HandlerConditions *pCond = NULL;	// HandlerConditionsオブジェクトポインタpCondをNULLに初期化.
+	if (CWindow::m_mapHandlerMap.find(wParam) != CWindow::m_mapHandlerMap.end()) {	// findでキーをwParamとするHandlerConditionsオブジェクトポインタが見つかったら.
+		pCond = CWindow::m_mapHandlerMap[wParam];	// wParamでキーが取得できるので, それを使ってハンドラマップからHandlerConditionsオブジェクトポインタを引き出す.
+	}
+	if (pCond != NULL) {	// pCondがNULLでないなら, ハンドラが登録されている.
+		int iRet = (this->*pCond->hfp)(wParam, lParam);	// 登録したハンドラpCond->hfpを呼び出し, 戻り値はiRetに格納.
+		if (iRet == 0) {	// 0なら処理をした.
+			return TRUE;	// 処理をしたのでTRUE.
+		}
+	}
+
+	// コマンドを処理していないのでFALSE.
+	return FALSE;	// FALSEを返す.
 
 }

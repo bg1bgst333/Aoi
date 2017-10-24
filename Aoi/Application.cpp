@@ -33,6 +33,13 @@ int CApplication::Run() {
 // メンバ関数ExitInstance
 int CApplication::ExitInstance() {
 
+	// ハンドラマップの破棄.
+	std::map<DWORD, HandlerConditions *>::iterator itor = CWindow::m_mapHandlerMap.begin();	// ハンドラマップのイテレータを取得.
+	while (itor != CWindow::m_mapHandlerMap.end()) {	// ハンドラマップの終端まで繰り返す.
+		delete itor->second;	// itor->secondがHandlerConditionsオブジェクトポインタなので, deleteでこれを破棄.
+		itor++;	// イテレータを進める.
+	}
+
 	// メインウィンドウの破棄.
 	if (m_pMainWindow != NULL) {	// m_pMainWindowがNULLでない時.
 

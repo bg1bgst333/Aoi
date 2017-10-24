@@ -41,7 +41,45 @@ int CMainWindow::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 	// メニューのセット.
 	m_pMenuBar->SetMenu(hwnd);	// SetMenuでhwndにメニューをセット.
 
+	// メニューハンドラの追加.
+	AddCommandHandler(ID_FILE_OPEN, 0, (int(CWindow::*)(WPARAM, LPARAM))&CMainWindow::OnFileOpen);	// AddCommandHandlerでID_FILE_OPENに対するハンドラCMainWindow::OnFileOpenを登録.
+	AddCommandHandler(ID_FILE_SAVEAS, 0, (int(CWindow::*)(WPARAM, LPARAM))&CMainWindow::OnFileSaveAs);	// AddCommandHandlerでID_FILE_SAVEASに対するハンドラCMainWindow::OnFileSaveAsを登録.
+
 	// 今回は常にウィンドウ作成成功とする.
 	return 0;	// 成功なら0を返す.
+
+}
+
+// メンバ関数OnDestroy
+void CMainWindow::OnDestroy() {
+
+	// メニューハンドラの削除.
+	DeleteCommandHandler(ID_FILE_SAVEAS, 0);	// DeleteCommandHandlerでID_FILE_SAVEASのハンドラを削除.
+	DeleteCommandHandler(ID_FILE_OPEN, 0);	// DeleteCommandHandlerでID_FILE_OPENのハンドラを削除.
+
+	// 親のOnDestroyを呼ぶ.
+	CMenuWindow::OnDestroy();	// CMenuWindow::OnDestroyを呼ぶ.
+
+}
+
+// メンバ関数OnFileOpen
+int CMainWindow::OnFileOpen(WPARAM wParam, LPARAM lParam) {
+
+	// "開く"と表示.
+	MessageBox(m_hWnd, _T("開く"), _T("Aoi"), MB_OK | MB_ICONASTERISK);	// MessageBoxで"開く"と表示.
+
+	// 処理したので0を返す.
+	return 0;	// 0を返す.
+
+}
+
+// メンバ関数OnFileSaveAs
+int CMainWindow::OnFileSaveAs(WPARAM wParam, LPARAM lParam) {
+
+	// "名前を付けて保存"と表示.
+	MessageBox(m_hWnd, _T("名前を付けて保存"), _T("Aoi"), MB_OK | MB_ICONASTERISK);	// MessageBoxで"名前を付けて保存"と表示.
+
+	// 処理したので0を返す.
+	return 0;	// 0を返す.
 
 }
