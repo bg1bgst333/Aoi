@@ -1,6 +1,7 @@
 // ヘッダのインクルード
 // 独自のヘッダ
 #include "MainWindow.h"	// CMainWindow
+#include "FileDialog.h"	// CFileDialog
 #include "resource.h"	// リソースID
 
 // コンストラクタCMainWindow
@@ -90,8 +91,14 @@ void CMainWindow::OnSize(UINT nType, int cx, int cy) {
 // メンバ関数OnFileOpen
 int CMainWindow::OnFileOpen(WPARAM wParam, LPARAM lParam) {
 
-	// "開く"と表示.
-	MessageBox(m_hWnd, _T("開く"), _T("Aoi"), MB_OK | MB_ICONASTERISK);	// MessageBoxで"開く"と表示.
+	// ファイルダイアログの表示.
+	CFileDialog selDlg(NULL, NULL, _T("Text Files(*.txt)|*.txt|All Files(*.*)|*.*||"), OFN_FILEMUSTEXIST);	// CFileDialogオブジェクトselDlgを定義.
+	if (selDlg.ShowOpenDialog(m_hWnd)) {	// selDlg.ShowOpenDialogで"開く"ダイアログを表示.
+
+		// 選択したファイル名の表示.
+		MessageBox(m_hWnd, selDlg.m_tstrPath.c_str(), _T("Aoi"), MB_OK | MB_ICONASTERISK);	// MessageBoxでselDlg.m_tstrPathを表示.
+
+	}
 
 	// 処理したので0を返す.
 	return 0;	// 0を返す.
@@ -101,8 +108,14 @@ int CMainWindow::OnFileOpen(WPARAM wParam, LPARAM lParam) {
 // メンバ関数OnFileSaveAs
 int CMainWindow::OnFileSaveAs(WPARAM wParam, LPARAM lParam) {
 
-	// "名前を付けて保存"と表示.
-	MessageBox(m_hWnd, _T("名前を付けて保存"), _T("Aoi"), MB_OK | MB_ICONASTERISK);	// MessageBoxで"名前を付けて保存"と表示.
+	// ファイルダイアログの表示.
+	CFileDialog selDlg(NULL, _T("txt"), _T("Text Files(*.txt)|*.txt|All Files(*.*)|*.*||"), OFN_OVERWRITEPROMPT);	// CFileDialogオブジェクトselDlgを定義.
+	if (selDlg.ShowSaveDialog(m_hWnd)) {	// selDlg.ShowSaveDialogで"名前を付けて保存"ダイアログを表示.
+
+		// 指定したファイル名の表示.
+		MessageBox(m_hWnd, selDlg.m_tstrPath.c_str(), _T("Aoi"), MB_OK | MB_ICONASTERISK);	// MessageBoxでselDlg.m_tstrPathを表示.
+
+	}
 
 	// 処理したので0を返す.
 	return 0;	// 0を返す.

@@ -16,7 +16,7 @@
 #define tstring std::string
 #endif
 
-// エディットコントロールクラスCWindow
+// エディットコントロールクラスCEdit
 class CEdit : public CCustomControl {
 
 	// publicメンバ
