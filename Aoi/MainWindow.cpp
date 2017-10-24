@@ -9,6 +9,7 @@ CMainWindow::CMainWindow() : CMenuWindow(){
 
 	// メンバの初期化.
 	m_pEdit = NULL;	// m_pEditをNULLで初期化.
+	m_pTextFile = NULL;	// m_pTextFileをNULLで初期化.
 
 }
 
@@ -16,6 +17,10 @@ CMainWindow::CMainWindow() : CMenuWindow(){
 CMainWindow::~CMainWindow() {
 
 	// メンバの終了処理.
+	if (m_pTextFile != NULL) {
+		delete m_pTextFile;	// deleteでm_pTextFileを解放.
+		m_pTextFile = NULL;	// m_pTextFileにNULLをセット.
+	}
 	if (m_pEdit != NULL) {
 		delete m_pEdit;	// deleteでm_pEditを解放.
 		m_pEdit = NULL;	// m_pEditにNULLをセット.
@@ -61,6 +66,9 @@ int CMainWindow::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 	// エディットコントロールの作成.
 	m_pEdit->Create(_T(""), WS_HSCROLL | WS_VSCROLL | WS_BORDER | ES_MULTILINE | ES_WANTRETURN | ES_AUTOHSCROLL | ES_AUTOVSCROLL, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hwnd, (HMENU)(WM_APP + 1), lpCreateStruct->hInstance);	// m_pEdit->Createでエディットコントロールを作成.
 
+	// テキストファイルオブジェクトの生成.
+	m_pTextFile = new CTextFile();	// CTextFileオブジェクトを作成し, ポインタをm_pTextFileに格納.
+
 	// 今回は常にウィンドウ作成成功とする.
 	return 0;	// 成功なら0を返す.
 
@@ -68,6 +76,12 @@ int CMainWindow::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 
 // メンバ関数OnDestroy
 void CMainWindow::OnDestroy() {
+
+	// テキストファイルオブジェクトの破棄.
+	if (m_pTextFile != NULL) {
+		delete m_pTextFile;	// deleteでm_pTextFileを解放.
+		m_pTextFile = NULL;	// m_pTextFileにNULLをセット.
+	}
 
 	// メニューハンドラの削除.
 	DeleteCommandHandler(ID_FILE_SAVEAS, 0);	// DeleteCommandHandlerでID_FILE_SAVEASのハンドラを削除.
@@ -95,8 +109,10 @@ int CMainWindow::OnFileOpen(WPARAM wParam, LPARAM lParam) {
 	CFileDialog selDlg(NULL, NULL, _T("Text Files(*.txt)|*.txt|All Files(*.*)|*.*||"), OFN_FILEMUSTEXIST);	// CFileDialogオブジェクトselDlgを定義.
 	if (selDlg.ShowOpenDialog(m_hWnd)) {	// selDlg.ShowOpenDialogで"開く"ダイアログを表示.
 
-		// 選択したファイル名の表示.
-		MessageBox(m_hWnd, selDlg.m_tstrPath.c_str(), _T("Aoi"), MB_OK | MB_ICONASTERISK);	// MessageBoxでselDlg.m_tstrPathを表示.
+		// テキストファイルを開いて, テキストをエディットコントロールにセット.
+		if (m_pTextFile->Read(selDlg.m_tstrPath.c_str())) {	// m_pTextFile->Readで読み込み.
+			m_pEdit->SetText(m_pTextFile->m_tstrText);	// m_pEdit->SetTextでエディットコントロールにm_pTextFile->m_tstrTextをセット.
+		}
 
 	}
 
@@ -112,8 +128,12 @@ int CMainWindow::OnFileSaveAs(WPARAM wParam, LPARAM lParam) {
 	CFileDialog selDlg(NULL, _T("txt"), _T("Text Files(*.txt)|*.txt|All Files(*.*)|*.*||"), OFN_OVERWRITEPROMPT);	// CFileDialogオブジェクトselDlgを定義.
 	if (selDlg.ShowSaveDialog(m_hWnd)) {	// selDlg.ShowSaveDialogで"名前を付けて保存"ダイアログを表示.
 
-		// 指定したファイル名の表示.
-		MessageBox(m_hWnd, selDlg.m_tstrPath.c_str(), _T("Aoi"), MB_OK | MB_ICONASTERISK);	// MessageBoxでselDlg.m_tstrPathを表示.
+		// 指定したテキストファイルに, エディットコントロールのテキストを保存.
+		m_pEdit->GetText();	// エディットコントロールのテキストを取得.
+		m_pTextFile->SetText(m_pEdit->m_tstrText);	// テキストファイルに書き込むテキストm_pEdit->m_tstrTextをセット.
+		m_pTextFile->SetNewLine(CTextFile::NEW_LINE_CRLF);	// 改行コードはCRLF.
+		m_pTextFile->SetEncoding(CTextFile::ENCODING_SHIFTJIS, CTextFile::BOM_NONE);	// Shift_JIS, BOMなし.
+		m_pTextFile->Write(selDlg.m_tstrPath.c_str());	// m_pTextFile->WriteでselDlg.m_tstrPathに書き込み.
 
 	}
 

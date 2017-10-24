@@ -5,6 +5,7 @@
 // 独自のヘッダ
 #include "MenuWindow.h"	// CMenuWindow
 #include "Edit.h"	// CEdit
+#include "TextFile.h"	// CTextFile
 
 // メインウィンドウクラスCMainWindow
 class CMainWindow : public CMenuWindow {
@@ -14,6 +15,7 @@ class CMainWindow : public CMenuWindow {
 
 		// publicメンバ変数
 		CEdit *m_pEdit;	// CEditオブジェクトポインタm_pEdit.
+		CTextFile *m_pTextFile;	// CTextFileオブジェクトポインタm_pTextFile.
 
 		// publicメンバ関数
 		// コンストラクタ・デストラクタ
