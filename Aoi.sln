@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Aoi", "Aoi\Aoi.vcxproj", "{A60863FC-1287-4A25-A010-F2B38DDDFEFD}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AoiSetup", "AoiSetup\AoiSetup.vdproj", "{D6D2D1AE-51FE-4699-8AD9-F2ED412F899A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,11 @@ Global
 		{A60863FC-1287-4A25-A010-F2B38DDDFEFD}.Release|x64.Build.0 = Release|x64
 		{A60863FC-1287-4A25-A010-F2B38DDDFEFD}.Release|x86.ActiveCfg = Release|Win32
 		{A60863FC-1287-4A25-A010-F2B38DDDFEFD}.Release|x86.Build.0 = Release|Win32
+		{D6D2D1AE-51FE-4699-8AD9-F2ED412F899A}.Debug|x64.ActiveCfg = Debug
+		{D6D2D1AE-51FE-4699-8AD9-F2ED412F899A}.Debug|x86.ActiveCfg = Debug
+		{D6D2D1AE-51FE-4699-8AD9-F2ED412F899A}.Debug|x86.Deploy.0 = Debug
+		{D6D2D1AE-51FE-4699-8AD9-F2ED412F899A}.Release|x64.ActiveCfg = Release
+		{D6D2D1AE-51FE-4699-8AD9-F2ED412F899A}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
